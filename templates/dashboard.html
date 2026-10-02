@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card dashboard-card">
+            <div class="card-header">
+                <h5><i class="fas fa-coins me-2"></i>Select Currency</h5>
+            </div>
+            <div class="card-body">
+                <select id="symbolSelect" class="form-select">
+                    <option value="BTC">Bitcoin (BTC)</option>
+                    <option value="ETH">Ethereum (ETH)</option>
+                    <option value="SOL">Solana (SOL)</option>
+                    <option value="BNB">Binance Coin (BNB)</option>
+                    <option value="XRP">XRP (XRP)</option>
+                    <option value="DOGE">Dogecoin (DOGE)</option>
+                    <option value="ADA">Cardano (ADA)</option>
+                    <option value="AVAX">Avalanche (AVAX)</option>
+                    <option value="LINK">Chainlink (LINK)</option>
+                    <option value="DOT">Polkadot (DOT)</option>
+                    <option value="LTC">Litecoin (LTC)</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Portfolio Overview -->
+    <div class="col-lg-4 mb-4">
+        <div class="card dashboard-card">
+            <div class="card-header">
+                <h5><i class="fas fa-wallet me-2"></i>Portfolio</h5>
+            </div>
+            <div class="card-body">
+                <div id="portfolioData">
+                    <p><strong>Balance:</strong> $<span id="balance">10000</span></p>
+                    <p><strong><span class="symbolName"></span> Amount:</strong> <span id="cryptoAmount">0</span></p>
+                    <p><strong>Current <span class="symbolName"></span> Price:</strong> $<span id="currentPrice">0</span></p>
+                    <p><strong>Portfolio Value:</strong> $<span id="portfolioValue">10000</span></p>
+                    <p><strong>Total Trades:</strong> <span id="totalTrades">0</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Controls -->
+    <div class="col-lg-4 mb-4">
+        <div class="card dashboard-card">
+            <div class="card-header">
+                <h5><i class="fas fa-brain me-2"></i>AI Trading Bot</h5>
+            </div>
+            <div class="card-body">
+                <button id="trainModelBtn" class="btn btn-primary btn-sm mb-2 w-100">
+                    <i class="fas fa-graduation-cap me-1"></i>Train AI Model
+                </button>
+                <button id="predictTradeBtn" class="btn btn-success btn-sm mb-2 w-100">
+                    <i class="fas fa-chart-line me-1"></i>Predict & Trade
+                </button>
+                <button id="autoTradeBtn" class="btn btn-warning btn-sm mb-2 w-100">
+                    <i class="fas fa-play me-1"></i>Start Auto Trading
+                </button>
+                <button id="stopTradeBtn" class="btn btn-danger btn-sm mb-2 w-100">
+                    <i class="fas fa-stop me-1"></i>Stop Auto Trading
+                </button>
+                
+                <div id="aiStatus" class="mt-3">
+                    <small class="text-muted">Status: Waiting for training...</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manual Trading -->
+    <div class="col-lg-4 mb-4">
+        <div class="card dashboard-card">
+            <div class="card-header">
+                <h5><i class="fas fa-hand-holding-usd me-2"></i>Manual Trading</h5>
+            </div>
+            <div class="card-body">
+                <form id="manualTradeForm">
+                    <div class="mb-3">
+                        <label for="tradeAmount" class="form-label">Amount (USD)</label>
+                        <input type="number" id="tradeAmount" class="form-control" placeholder="Enter amount" min="1" required>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="button" id="manualBuyBtn" class="btn btn-success">
+                            <i class="fas fa-arrow-up me-1"></i>Buy
+                        </button>
+                        <button type="button" id="manualSellBtn" class="btn btn-danger">
+                            <i class="fas fa-arrow-down me-1"></i>Sell
+                        </button>
+                        <button type="button" id="manualHoldBtn" class="btn btn-secondary">
+                            <i class="fas fa-pause me-1"></i>Hold
+                        </button>
+                    </div>
+                </form>
+                <div id="manualTradeStatus" class="mt-3 text-muted small">Waiting for manual input...</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Latest Prediction -->
+<div class="row">
+    <div class="col-12">
+        <div class="card dashboard-card">
+            <div class="card-header">
+                <h5><i class="fas fa-crystal-ball me-2"></i>Latest Prediction</h5>
+            </div>
+            <div class="card-body">
+                <div id="predictionData">
+                    <p><strong>Current Price:</strong> $<span id="predCurrentPrice">-</span></p>
+                    <p><strong>Predicted Price:</strong> $<span id="predPrice">-</span></p>
+                    <p><strong>Signal:</strong> <span id="signal" class="badge bg-secondary">NONE</span></p>
+                    <p><strong>Model Hash:</strong> <span id="modelHash" class="small text-muted">Not trained</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card dashboard-card">
+            <div class="card-header">
+                <h5 id="chartTitle"><i class="fas fa-chart-area me-2"></i>Price Chart (Last 30 Days)</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="priceChart" height="100"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Blockchain Ledger -->
+<div class="row">
+    <div class="col-12">
+        <div class="card dashboard-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5><i class="fas fa-link me-2"></i>Blockchain Ledger</h5>
+                <button id="refreshBlockchainBtn" class="btn btn-outline-primary btn-sm">
+                    <i class="fas fa-sync me-1"></i>Refresh
+                </button>
+            </div>
+            <div class="card-body">
+                <div id="blockchainData" class="blockchain-container"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentSymbol = 'BTC';
+
+document.getElementById('symbolSelect').addEventListener('change', async (e) => {
+    const symbol = e.target.value;
+    currentSymbol = symbol;
+    await fetch('/api/set_symbol', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ symbol })
+    });
+    loadPortfolioData();
+});
+
+document.getElementById('manualBuyBtn').addEventListener('click', () => manualTrade('BUY'));
+document.getElementById('manualSellBtn').addEventListener('click', () => manualTrade('SELL'));
+document.getElementById('manualHoldBtn').addEventListener('click', () => manualTrade('HOLD'));
+
+async function manualTrade(action) {
+    const amount = parseFloat(document.getElementById('tradeAmount').value);
+    const status = document.getElementById('manualTradeStatus');
+    if (!amount || amount <= 0) {
+        status.textContent = "⚠️ Please enter a valid amount.";
+        return;
+    }
+
+    status.textContent = `⏳ Processing ${action}...`;
+
+    const res = await fetch('/api/manual_trade', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action, amount })
+    });
+
+    const data = await res.json();
+    if (data.error) {
+        status.textContent = `❌ Error: ${data.error}`;
+    } else {
+        status.innerHTML = `✅ ${data.message}<br>
+            💰 New Balance: $${data.balance.toFixed(2)}<br>
+            💎 ${currentSymbol} Holdings: ${data.holdings.toFixed(6)}`;
+        loadPortfolioData();
+    }
+}
+
+async function loadPortfolioData() {
+    const res = await fetch('/api/portfolio');
+    const data = await res.json();
+    document.getElementById('balance').textContent = data.balance.toFixed(2);
+    document.getElementById('cryptoAmount').textContent = data.crypto_amount.toFixed(6);
+    document.getElementById('currentPrice').textContent = data.current_price.toFixed(2);
+    document.getElementById('portfolioValue').textContent = data.portfolio_value.toFixed(2);
+    document.getElementById('totalTrades').textContent = data.total_trades;
+    document.querySelectorAll('.symbolName').forEach(el => el.textContent = data.current_symbol);
+}
+loadPortfolioData();
+</script>
+
+{% endblock %}
